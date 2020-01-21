@@ -25,9 +25,9 @@ var clientes_transmisores = [];
 
 var http_files = {};
 [
-    ["/jquery.min.js","application/javascript"],
-    ["/frontend.js","application/javascript"],
-    ["/frontend.html","text/html"]
+    ["./frontend/jquery.min.js","application/javascript"],
+    ["./frontend/frontend.js","application/javascript"],
+    ["./frontend/frontend.html","text/html"]
 ].forEach(function(fn){
     http_files[fn[0]]={
         content : fs.readFileSync('.'+fn[0]).toString(),
@@ -35,8 +35,8 @@ var http_files = {};
     };
 });
 
-http_files["/"]=http_files["/frontend.html"];
-http_files["/index.html"]=http_files["/frontend.html"];
+http_files["/"]=http_files["./frontend/frontend.html"];
+http_files["/index.html"]=http_files["./frontend/frontend.html"];
 
 /**
  * Helper function for escaping input strings

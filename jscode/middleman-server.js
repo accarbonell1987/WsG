@@ -33,7 +33,8 @@ var http_files = {};
     ["/amchart/amcharts.js","application/javascript"],
     ["/amchart/serial.js","application/javascript"],
     ["/amchart/themes/light.js","application/javascript"],
-    ["/frontend.html","text/html"]
+    ["/frontend.html","text/html"],
+    ["/amchart/images/dragIconRoundBig.svg","image/svg+xml"]
 ].forEach(function(fn){
     http_files[fn[0]]={
         content : fs.readFileSync('.'+fn[0]).toString(),

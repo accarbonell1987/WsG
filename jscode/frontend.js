@@ -7,9 +7,12 @@ $(function () {
     var status = $('#status');
 
     // my color assigned by the server
-    var myColor = false;
+    //var myColor = false;
     // my name sent to the server
-    var myName = false;
+    //var myName = false;
+
+    //asignado por el servidor
+    var idCliente = false;
 
     // if user is running mozilla then use it's built-in WebSocket
     window.WebSocket = window.WebSocket || window.MozWebSocket;
@@ -29,7 +32,7 @@ $(function () {
     connection.onopen = function () {
         // first we want users to enter their names
         input.removeAttr('disabled');
-        status.text('Choose name:');
+        status.text('Id del cliente (numero):');
     };
 
     connection.onerror = function (error) {
@@ -52,24 +55,24 @@ $(function () {
 
         // NOTE: if you're not sure about the JSON structure
         // check the server source code above
-        if (json.type === 'color') { // first response from the server with user's color
-            myColor = json.data;
-            status.text(myName + ': ').css('color', myColor);
+        if (json.type === 'registro') { // first response from the server with user's color
+            idCliente = json.data;
             input.removeAttr('disabled').focus();
             // from now user can start sending messages
-        } else if (json.type === 'history') { // entire message history
-            // insert every single message to the chat window
-            for (var i=0; i < json.data.length; i++) {
-                addMessage(json.data[i].author, json.data[i].text,
-                           json.data[i].color, new Date(json.data[i].time));
-            }
-        } else if (json.type === 'message') { // it's a single message
+        }else if (json.type === 'message') { // it's a single message
             input.removeAttr('disabled'); // let the user write another message
-            addMessage(json.data.author, json.data.text,
-                       json.data.color, new Date(json.data.time));
+            addMessage(json.data.id, json.data.valor,
+                       new Date(json.data.time));
         } else {
             console.log('Hmm..., I\'ve never seen JSON like this: ', json);
         }
+        // } else if (json.type === 'history') { // entire message history
+        //     // insert every single message to the chat window
+        //     for (var i=0; i < json.data.length; i++) {
+        //         addMessage(json.data[i].author, json.data[i].text,
+        //                    json.data[i].color, new Date(json.data[i].time));
+        //     }
+        // } else 
     };
 
     /**
@@ -89,8 +92,8 @@ $(function () {
             input.attr('disabled', 'disabled');
 
             // we know that the first message sent from a user their name
-            if (myName === false) {
-                myName = msg;
+            if (idCliente === false) {
+                idCliente = msg;
             }
         }
     });
@@ -111,10 +114,10 @@ $(function () {
     /**
      * Add message to the chat window
      */
-    function addMessage(author, message, color, dt) {
-        content.prepend('<p><span style="color:' + color + '">' + author + '</span> @ ' +
+    function addMessage(id, valor, dt) {
+        content.prepend('<p><span>' + id + '</span> @ ' +
              + (dt.getHours() < 10 ? '0' + dt.getHours() : dt.getHours()) + ':'
              + (dt.getMinutes() < 10 ? '0' + dt.getMinutes() : dt.getMinutes())
-             + ': ' + message + '</p>');
+             + ': ' + valor + '</p>');
     }
 });

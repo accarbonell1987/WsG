@@ -138,10 +138,18 @@ $(function () {
     }
 
     function plotearEnGrafica(v, dt) {
-        grafica.dataProvider.push( {
+        var pdatos = grafica.dataProvider;
+
+        if (pdatos.lenght >= 200) {
+            pdatos = pdatos.splice(0,1); //eliminar el primer elemento
+        }
+        
+        pdatos.push( {
             fecha: dt,
             valor: v
         } );
+
+        grafica.dataProvider = pdatos;
         grafica.validateData();
     }
 

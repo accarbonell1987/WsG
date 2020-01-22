@@ -30,6 +30,12 @@ var http_files = {};
 [
     ["/jquery.min.js","application/javascript"],
     ["/frontend.js","application/javascript"],
+    ["/frontend.js","application/javascript"],
+    ["/frontend.js","application/javascript"],
+    ["/amchart/amcharts.js","application/javascript"],
+    ["/amchart/serial.js","application/javascript"],
+    ["/amchart/amstock.js","application/javascript"],
+    ["/amchart/themes/light.js","application/javascript"],
     ["/frontend.html","text/html"]
 ].forEach(function(fn){
     http_files[fn[0]]={
@@ -112,7 +118,7 @@ wsServer.on('request', function(request) {
                 idCliente = htmlEntities(message.utf8Data);
                 connection.sendUTF(JSON.stringify({ type:'registro', data: idCliente }));
                 console.log((new Date()) + ' Usuario conocido como: ' + idCliente + '.');
-                
+
                 //si el id es menor 1000 entonces es un cliente emisor sino es receptor
                 if (idCliente < 1000) {
                     //si no exite un cliente emisor con ese id lo adiciono al arreglo y busco
@@ -130,15 +136,21 @@ wsServer.on('request', function(request) {
                     });
                 }else{
                     //si no exite un cliente receptor con ese id lo adiciono al arreglo y busco
-                    if (!clientes_receptores.find(element => element == idCliente)){
-                        clientes_receptores.push(idCliente);
-                        console.log((new Date()) +'  Cliente adicionado, '+ idCliente + ' tipo: Receptor.');
+                    if (!clientes_receptores.find(element => element.id == idCliente)){
+                        //objeto que relaciona el id con la conexion
+                        var datosCliente = {
+                            id: idCliente, 
+                            conexion: connection
+                        };
+                        clientes_receptores.push(datosCliente);
+                        console.log((new Date()) +' Cliente adicionado, '+ idCliente + ' tipo: Receptor.');
                     }
+
                     console.log((new Date()) + ' Eliminando registros de relaciones con emisores. ');
                     //recorrer el relacion_emisorreceptor eliminando los datos pertenecientes a un cliente con ese mismo id
                     relacion_emisorreceptor.forEach(elemento => {
                         //elimino el elemento si pertenece al id del cliente
-                        if (elemento.idreceptor == idCliente) logdatos.pop(elemento);
+                        if (elemento.id == idCliente) logdatos.pop(elemento);
                     });
                 }
                 //connection.sendUTF(JSON.stringify({ type:'color', data: userColor }));
@@ -147,6 +159,7 @@ wsServer.on('request', function(request) {
                             + idCliente + ': ' + message.utf8Data);
                 
                 //adicionar el dato numerico a la session del cliente
+
                 var obj = {
                     time: (new Date()).getTime(),
                     valor: htmlEntities(message.utf8Data),
@@ -158,7 +171,7 @@ wsServer.on('request', function(request) {
                 var json = JSON.stringify({ type:'message', data: obj });
 
                 for (var i=0; i < clientes_receptores.length; i++) {
-                    clientes_receptores[i].sendUTF(json);
+                    clientes_receptores[i].conexion.sendUTF(json);
                 }
             }
         //}
@@ -171,10 +184,10 @@ wsServer.on('request', function(request) {
                 + connection.remoteAddress + " desconectado.");
 
             if (idCliente < 1000) {
-                var posicion = clientes_emisores.findIndex(idCliente);
+                var posicion = clientes_emisores.findIndex(p => p == idCliente);
                 clientes_emisores.slice(posicion, 1);
             } else {
-                var posicion = clientes_receptores.findIndex(idCliente);
+                var posicion = clientes_receptores.findIndex(p => p.id == idCliente);
                 clientes_receptores.slice(posicion, 1);
             }
         }

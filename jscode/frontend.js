@@ -14,6 +14,9 @@ $(function () {
     //asignado por el servidor
     var idCliente = false;
 
+    var primerPunto = true;
+    var grafica = crearGrafica();
+
     // if user is running mozilla then use it's built-in WebSocket
     window.WebSocket = window.WebSocket || window.MozWebSocket;
 
@@ -59,10 +62,23 @@ $(function () {
             idCliente = json.data;
             input.removeAttr('disabled').focus();
             // from now user can start sending messages
-        }else if (json.type === 'message') { // it's a single message
+        } else if (json.type === 'message') { // it's a single message
             input.removeAttr('disabled'); // let the user write another message
-            addMessage(json.data.id, json.data.valor,
-                       new Date(json.data.time));
+
+            var time = new Date(json.data.time);
+            var valor = json.data.valor;
+
+            addMessage(json.data.id, valor, time);
+
+            if (primerPunto){
+                grafica = crearGrafica(valor, time);
+                primerPunto = false;
+            }else{
+                plotearEnGrafica(valor, time);
+            }
+
+        } else if (json.type === 'validacion') {
+
         } else {
             console.log('Hmm..., I\'ve never seen JSON like this: ', json);
         }
@@ -91,7 +107,7 @@ $(function () {
             // sends back response
             input.attr('disabled', 'disabled');
 
-            // we know that the first message sent from a user their name
+            // we know that the first message sent from a user their id
             if (idCliente === false) {
                 idCliente = msg;
             }
@@ -119,5 +135,72 @@ $(function () {
              + (dt.getHours() < 10 ? '0' + dt.getHours() : dt.getHours()) + ':'
              + (dt.getMinutes() < 10 ? '0' + dt.getMinutes() : dt.getMinutes())
              + ': ' + valor + '</p>');
+    }
+
+    function plotearEnGrafica(v, dt) {
+        grafica.dataProvider.push( {
+            fecha: dt,
+            valor: v
+        } );
+        grafica.validateData();
+    }
+
+    function crearGrafica(v, dt){
+        /**
+         * Create the chart
+         */
+        var chartData = generateChartData();
+
+        var chart = AmCharts.makeChart( "chartdiv", {
+            "type": "serial",
+            "theme": "light",
+            "zoomOutButton": {
+                "backgroundColor": '#000000',
+                "backgroundAlpha": 0.15
+            },
+            "dataProvider": chartData,
+            "categoryField": "fecha",
+            "categoryAxis": {
+                "parseDates": true,
+                "minPeriod": "fff",
+                "dashLength": 1,
+                "gridAlpha": 0.15,
+                "axisColor": "#DADADA"
+            },
+            "graphs": [ {
+                "id": "g1",
+                "valueField": "valor",
+                "bullet": "round",
+                "bulletBorderColor": "#FFFFFF",
+                "bulletBorderThickness": 0,
+                "lineThickness": 1,
+                "lineColor": "#b5030d",
+                "negativeLineColor": "#0352b5",
+                "hideBulletsCount": 1
+            } ],
+            "chartCursor": {
+                "cursorPosition": "mouse"
+            },
+            "chartScrollbar": {
+                "graph": "g1",
+                "scrollbarHeight": 40,
+                "color": "#FFFFFF",
+                "autoGridCount": false
+            }
+            } );
+
+        /**
+         * Function that generates random data
+         */
+        function generateChartData() {
+            var chartData = [];
+            chartData.push({
+                fecha: dt,
+                valor: v
+                });
+            return chartData;
+        }
+
+        return chart;
     }
 });

@@ -34,7 +34,6 @@ var http_files = {};
     ["/frontend.js","application/javascript"],
     ["/amchart/amcharts.js","application/javascript"],
     ["/amchart/serial.js","application/javascript"],
-    ["/amchart/amstock.js","application/javascript"],
     ["/amchart/themes/light.js","application/javascript"],
     ["/frontend.html","text/html"]
 ].forEach(function(fn){

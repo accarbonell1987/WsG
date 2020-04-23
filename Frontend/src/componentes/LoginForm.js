@@ -6,14 +6,16 @@ import '../css/ecg.css';
 
 class LoginForm extends React.Component{
 
+    //#region Atributos
+    wsAuth = new WebSocket(window.$WebsocketsIp);
+    //#endregion
+
     constructor(props) {
         super(props);
         this.state = {  
             VistaAdmin: this.props.VistaAdmin         
         }; 
     }
-       
-    wsAuth = new WebSocket(window.$WebsocketsIp);
                     
     componentDidMount() {
 
@@ -117,30 +119,19 @@ class LoginForm extends React.Component{
     }
 
     vinculoRender = () => {
-
         if (this.state.VistaAdmin) {
-
             return (
-
                 <p className="forgot-password text-right">
                     Ir a  <a href="/"> Login Doctor</a>
                 </p>
-
             )
-
         } else {
-
             return (
-
                 <p className="forgot-password text-right">
                     Ir a  <a href="/Admin"> Login Admin</a>
                 </p>
-
             )
-
         }
-
-
     }
 
     imagenRender = () => {

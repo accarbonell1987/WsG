@@ -77,7 +77,7 @@ class ListarPacientes extends React.Component{
          // Esto es para la temporizacion.
         this.timerID = setTimeout(
             () => this.solPacientesBd(),
-            20
+            150
         );
         // Fin de temporizacion
 

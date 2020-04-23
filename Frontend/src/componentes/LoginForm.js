@@ -4,17 +4,12 @@ import React from 'react';
 //import '../css/App.css';
 import '../css/ecg.css';
 
-
-
-
 class LoginForm extends React.Component{
 
     constructor(props) {
         super(props);
         this.state = {  
-            
             VistaAdmin: this.props.VistaAdmin         
-        
         }; 
     }
        

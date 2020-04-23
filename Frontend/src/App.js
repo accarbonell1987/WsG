@@ -15,29 +15,18 @@ import Encabezado from './componentes/Encabezado';
 import Router from './componentes/Router';
 import FinalPagina from './componentes/FinalPagina';
 
-
-//const WebsocketsIp= 'ws://192.168.0.110:2000';
-window.$WebsocketsIp= 'ws://192.168.0.110:2000';
-
+window.$WebsocketsIp= 'ws://localhost:2000';
 
 class App extends React.Component{
-
     render () {
-
         return (
-
-           
             <>
             <Encabezado/>                      
             <Router />
             <FinalPagina/>
             </>
-            
-
         )
     }
 }
 
 export default App;
-
-

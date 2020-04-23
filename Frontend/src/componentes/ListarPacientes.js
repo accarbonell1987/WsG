@@ -4,6 +4,10 @@ import '../css/bootstrap/dist/css/bootstrap.min.css';
 import InsertarPaciente from './InsertarPaciente';
 import ModificarPaciente from './ModificarPaciente';
 
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Button from 'react-bootstrap/Button';
+
 class ListarPacientes extends React.Component{
 
     
@@ -104,7 +108,8 @@ class ListarPacientes extends React.Component{
          
         return (
             
-            <>            
+            <>                 
+
               <tr>
                <th scope="row">{i+1}</th>
                 <td align="center">{paciente.usuario_id}</td>

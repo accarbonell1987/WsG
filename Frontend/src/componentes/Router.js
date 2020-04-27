@@ -18,11 +18,9 @@ const Router = () => (
 
     <BrowserRouter a="0">
         <Switch >
-        
             <Route  exact path='/' component={DoctorDashBoard} />            
             <Route path="/Admin" component={AdminDashBoard} />
             <Route component={NoPagina} />
-            
         </Switch>
     </BrowserRouter>
 

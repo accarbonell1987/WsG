@@ -1,69 +1,86 @@
 .centrado {
     text-align: center;
   }
-  .izquierda {
-    text-align: center;
-  }
-  .derecha {
-    text-align: center;
-  } 
-
-  .formtablaDiv {
-
-    width: 100%;
-    
- }
-  .mainDiv {
-     margin-top: 1%;
-     margin-left: 5%;
-  }
-
-  .botonlogin {    
-    margin-left: 32%;    
-    width: 40%;
- } 
- 
-  .cardMargin {
-    margin-top: 0%;    
- }
-
-  .alertmargin {
-    margin-top: 0%;
-    margin-left: 0%;
- }
-
-  .alingTablasCentro {
-     margin-left: 20%;      
- }
-
- .alingTablasCentro2 {
-  margin-left: 33%;      
+.izquierda {
+  text-align: center;
 }
+.derecha {
+  text-align: center;
+} 
 
- .alingTablasfilas {
-     padding-left: 10px;      
-}
-
-  .fin-pagina {
-    text-align: center;
-  }
-  .contenedor {
-    
-    margin-top: 3%;
-    margin-left: 30%;    
-    width: 40%;
-    text-align: left;
-      
-  }
- 
-  .contenedor-e {
-    
-    margin-top: 10%;
-
-    width: 100%;
-    text-align: left;
-    margin-bottom: 10%;
-    background-color: rgb(234, 235, 236);
-      
-  }
+.formtablaDiv {
+  width: 100%;
   
+}
+.mainDiv {
+    margin-top: 1%;
+    margin-left: 5%;
+}
+
+.botonlogin {    
+  margin-left: 32%;    
+  width: 40%;
+} 
+ 
+.cardMargin {
+  margin-top: 0%;    
+}
+
+.alertmargin {
+  margin-top: 0%;
+  margin-left: 0%;
+}
+
+.alingTablasCentro {
+    margin-left: 20%;      
+}
+
+.alingTablasCentro2 {
+margin-left: 33%;      
+}
+
+.alingTablasfilas {
+    padding-left: 10px;      
+}
+
+.fin-pagina {
+  text-align: center;
+}
+ 
+.contenedor-e {
+  margin-top: 10%;
+  width: 100%;
+  height: auto;
+  text-align: left;
+  margin-bottom: 10%;
+  background-color: rgb(234, 235, 236);
+}
+
+
+html {
+  height: 100% !important;
+}
+
+body {
+  height: 100% !important;
+  top: 0;
+}
+
+#root {
+  height: 100% !important;
+  position: relative;
+}
+
+.card-footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+}
+
+.contenedor {
+  margin-top: 3%;
+  margin-left: 30%;    
+  width: 40%;
+  text-align: left;
+}

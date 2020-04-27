@@ -8,23 +8,19 @@ import React from 'react';
 
 
 // Css
-import './css/bootstrap/dist/css/bootstrap.min.css';
+//import './css/bootstrap/dist/css/bootstrap.min.css';
 
 //Componentes
-import Encabezado from './componentes/Encabezado';
 import Router from './componentes/Router';
 import FinalPagina from './componentes/FinalPagina';
-
 
 //const WebsocketsIp= 'ws://192.168.0.110:2000';
 window.$WebsocketsIp= 'ws://127.0.0.1:2000';
 
-
 class App extends React.Component{
 
     render () {
-
-        return (           
+        return (       
             <>                            
             <Router />
             <FinalPagina/>

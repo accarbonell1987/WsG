@@ -1,8 +1,28 @@
 import React from 'react';
 import moment from 'moment';
+
+//CSS
 import '../css/bootstrap/dist/css/bootstrap.min.css';
+
+
+// Componentes mios
+
 import InsertarPaciente from './InsertarPaciente';
 import ModificarPaciente from './ModificarPaciente';
+import DatosDoctor from './DatosDoctor';
+
+
+
+// Componentes del ReactBoostrap
+
+import Table from 'react-bootstrap/Table';
+import Alert from 'react-bootstrap/Alert';
+import Jumbotron from 'react-bootstrap/Jumbotron'; 
+import Container from 'react-bootstrap/Container';
+import Card from 'react-bootstrap/Card';
+import ListGroup from 'react-bootstrap/ListGroup';
+import ListGroupItem from 'react-bootstrap/ListGroupItem';
+import CardGroup from 'react-bootstrap/CardGroup'; 
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -111,34 +131,34 @@ class ListarPacientes extends React.Component{
             <>                 
 
               <tr>
-               <th scope="row">{i+1}</th>
-                <td align="center">{paciente.usuario_id}</td>
+               <th>{i+1}</th>
+                <td align="center" >{paciente.usuario_id}</td>
                 <td>{paciente.Nombre}</td>                
-                <td >{paciente.Apellidos}</td>
+                <td align="center">{paciente.Apellidos}</td>
                 <td align="center">{paciente.Genero}</td>
                 <td>{this.renderEstadoTX(paciente.Estado_de_TX)}</td>
                 <td align="center">{paciente.Freq_Muestro}</td>
                 <td align="center">{paciente.Periodo_de_Obs}</td>
-                <td align="center">{moment(Number(paciente.Ultimo_Contacto)).format("DD-MM-YYYY h:mm:ss")}</td>
-                <td align="center">
+                <td align="center" >{moment(Number(paciente.Ultimo_Contacto)).format("DD-MM-YYYY h:mm:ss")}</td>
+                <td >
                     <table>
                         <tr >
-                            <th>                                
+                            <td>                                
                                 <img onClick={(e)=>this.selVerExamenesPaciente(paciente)} src={process.env.PUBLIC_URL + '/listarExamenIcon.png'} />
-                                <span>Exámenes</span>
-                            </th>
-                            <th>                                
+                                Exámenes
+                            </td>
+                            <td>                                
                                 <img onClick={(e)=>this.selModificarPaciente(paciente)} src={process.env.PUBLIC_URL + '/EditarUsuariok.png'} />
-                                <span>Modificar</span>
-                            </th>
-                            <th>                                
+                                Modificar
+                            </td>
+                            <td>                                
                                 <img onClick={(e)=>this.selEliminarPaciente(paciente)} src={process.env.PUBLIC_URL + '/eliminar usuario.png'} />
                                 <span>Eliminar</span>
-                            </th>
-                            <th>                                
+                            </td>
+                            <td>                                
                                 <img onClick={(e)=>this.selVistaTR(paciente)} src={process.env.PUBLIC_URL + '/RTExamen.png'} />
                                 <span>Vista TR</span> 
-                            </th>                        
+                            </td>                        
                         </tr >
                     </table>            
                 </td>
@@ -217,68 +237,101 @@ class ListarPacientes extends React.Component{
 
     }
 
+    noHayPacienetes = () => {
+
+        if (this.state.Pacientes.length===0){
+            return (
+                <>
+                    <Alert variant='danger' className="centrado"> 
+                        <h5>
+                            Lo sentimos no hay pacientes disponibles. 
+                        </h5>
+                    </Alert>                 
+                </>
+            )
+        }
+    }
+
     render() {
 
         if (this.state.estadoRender===0){  // Listar
 
             return (
                        
-                <>
-
-                    <table style={{ position: "relative", width: "50%", height: "100px" }}>
-                    <tr >
-                        <th>                            
-                            <img onClick={(e)=>this.solPacientesBd()} src={process.env.PUBLIC_URL + '/ActualizarIcon.png'} />
-                            <span onClick={(e)=>this.solPacientesBd()}>Actualizar Pacientes</span>  
-                        </th>
-                        <th>
-                            <img onClick={(e)=>this.cambiarRender(1)} src={process.env.PUBLIC_URL + '/InsertarPacienteIcono.png'} />
-                            <span onClick={(e)=>this.cambiarRender(1)}>Insertar Paciente</span>                             
-                        </th>
-                        <th>                           
-                            <img onClick={(e)=>this.props.salir()} src={process.env.PUBLIC_URL + '/logout2.png'} />
-                            <span onClick={(e)=>this.props.salir()}>Salir Sesión</span>  
-                        </th>
-                    
-                    </tr >
-                    </table>
-                    
-                    
-                    <h3 className=" contenedor"> Pacientes del Dr. {this.state.tmpDoctor[0].Nombre}  {this.state.tmpDoctor[0].Apellidos} </h3>           
-                    <table classname="table " >
-    
-                        <thead class="thead-light">
+                <>                        
+                    <div className="mainDiv" style={{ width: '90%' }}>
+                        <Jumbotron  style={{ height: '200px'}}>
+                                                     
+                            <h1 className='centrado'>Bienvenido Dr. {this.state.tmpDoctor[0].Nombre}  {this.state.tmpDoctor[0].Apellidos} </h1>
+                            <p className='centrado'>
+                                En la siguiente Tabla se relacionan todos sus pacientes.                           
+                            </p>
+                              
+                        </Jumbotron>
+                        <table >
                             <tr >
-                                <th scope="col">#</th>                            
-                                <th scope="col">  Id_Paciente</th>                            
-                                <th scope="col">  Nombre</th>
-                                <th scope="col">  Apellidos</th>                            
-                                <th scope="col">  Genero (F/M) </th>
-                                <th scope="col">  Estado_TX</th>
-                                <th scope="col">  Freq. Muestreo</th>
-                                <th scope="col">  Periodo de Observacion</th>
-                                <th scope="col">  Ultimo Registro</th>
-                                <th scope="col" align="center">  Opciones</th>
-    
-                            </tr>
-                        </thead> 
-    
-                        <tbody>  
-                            <>    
-                                                                                 
-                                {this.state.Pacientes.map(this.agregarfila)}                                               
-                            
-                            </>  
-                        </tbody>                   
-                    </table>
+                                <td>  
+                                    <DatosDoctor doctor={this.state.tmpDoctor[0]}/>                        
+                                </td>
+                                
+                                    <Alert className="alertmargin" variant='secondary'>                                                   
+                                        <table className="alingTablasCentro" >
+                                            <tr >
+                                                <th >   
+                                                    <div  style={{ height: '70px'}} className="btn btn-success btn-block">                        
+                                                    <img  onClick={(e)=>this.solPacientesBd()} src={process.env.PUBLIC_URL + '/ActualizarIcon.png'} />
+                                                    <span className="alingTablasfilas" onClick={(e)=>this.solPacientesBd()}>Actualizar Pacientes</span>  
+                                                    </div> 
+                                                </th>
+                                                <th >
+                                                    <div style={{ height: '70px'}} className="btn btn-success btn-block"> 
+                                                    <img  className="alingTablasfilas" onClick={(e)=>this.cambiarRender(1)} src={process.env.PUBLIC_URL + '/InsertarPacienteIcono.png'} />
+                                                    <span className="alingTablasfilas" onClick={(e)=>this.cambiarRender(1)}>Insertar Paciente</span>                             
+                                                    </div>
+                                                </th>
+                                                <th>  
+                                                    <div style={{ height: '70px'}} className="btn btn-success btn-block">                         
+                                                    <img className="alingTablasfilas" onClick={(e)=>this.props.salir()} src={process.env.PUBLIC_URL + '/logout2.png'} />
+                                                    <span className="alingTablasfilas" onClick={(e)=>this.props.salir()}>Salir Sesión</span>  
+                                                    </div>
+                                                </th>                                            
+                                            </tr >
+                                        </table> 
+                                    </Alert>
+                                    <Table striped bordered hover size="sm" >
+                                        <thead>
+                                            <tr>
+                                                <th className="centrado">#</th>
+                                                <th className="centrado">Id_Paciente</th>
+                                                <th className="centrado">Nombre</th>
+                                                <th className="centrado">Apellidos</th>
+                                                <th className="centrado">Genero (F/M)</th>
+                                                <th className="centrado">Estado_TX</th>
+                                                <th className="centrado">FM(Hz)</th>
+                                                <th className="centrado">Observación (min)</th>
+                                                <th className="centrado">Último Registro</th>
+                                                <th className="centrado">Opciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <>                                                                                     
+                                                {this.state.Pacientes.map(this.agregarfila)}                                                                                                                            
+                                            </> 
+                                        </tbody>
+                                    </Table>  
 
+                                    {this.noHayPacienetes()}
+                                                    
+                            </tr >
+                        </table>                                                                      
+                    </div>  
                 </>    
                 
             );
 
         }else if (this.state.estadoRender===1){  // Insertar
 
-            return (<InsertarPaciente fun= {this.cambiarRender} doctorid= {this.state.tmpDoctor[0].usuario_id}/>)
+            return (<InsertarPaciente fun= {this.cambiarRender} doctorid= {this.state.tmpDoctor[0].usuario_id} doctor={this.state.tmpDoctor[0]}/>)
 
         }else if (this.state.estadoRender===2){   // Modificar
 

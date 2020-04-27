@@ -7,6 +7,19 @@ import DatosExamen from './DatosExamen';
 
 import '../css/ecg.css';
 
+// Componentes del ReactBoostrap
+
+import Table from 'react-bootstrap/Table';
+import Alert from 'react-bootstrap/Alert';
+import Jumbotron from 'react-bootstrap/Jumbotron'; 
+import Container from 'react-bootstrap/Container';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import Card from 'react-bootstrap/Card';
+import ListGroup from 'react-bootstrap/ListGroup';
+import ListGroupItem from 'react-bootstrap/ListGroupItem';
+import CardGroup from 'react-bootstrap/CardGroup'; 
+
 
 class ExamenDashBoard extends React.Component{
 
@@ -42,11 +55,11 @@ class ExamenDashBoard extends React.Component{
 
         if (this.state.estadoGrafica){
 
-            return ("Detener")
+            return ("||")
 
         } else {
 
-            return ("Comenzar")
+            return ("I>")
 
         }
 
@@ -57,14 +70,44 @@ class ExamenDashBoard extends React.Component{
         return (
 
             <>
-                <h1> Examen del Paciente: {this.props.epaciente.Nombre} con ID: {this.props.examen.examen_id} </h1>
-                <ChartJs  modificarEstado={this.modificarEstadoGrafica}  estadoGrafica={this.state.estadoGrafica} examen_id={this.props.examen.examen_id} tambloque={this.props.epaciente.Freq_Muestro} />
-                <button onClick={this.modificarEstadoGrafica} className="btn btn-primary btn-block">{this.renderBoton()}</button> 
-                <button onClick={(e)=>this.props.listaExamenes(this.props.epaciente.usuario_id,2)} className="btn btn-primary btn-block">Volver</button>    
-                <DatosPaciente paciente={this.props.epaciente}/>
-                <DatosExamen examen={this.props.examen}/>                                         
+                <div className="mainDiv" style={{ width: '90%' }}>
+                    <Jumbotron  style={{ height: '200px'}}>                                                     
+                        <h1 className='centrado'>Examen del Paciente: {this.props.epaciente.Nombre}</h1>
+                        <p className='centrado'>
+                            A continuacion se muestran los datos registrados para este exámen.                           
+                        </p>                                                       
+                    </Jumbotron>
+                    <Container style={{ width: '100%', paddingLeft:'0px', marginLeft:'0px', paddingRight: '0px', marginRight: '0px' }}>
+                        <Row>
+                            <Col md="auto">
+                                <DatosExamen examen={this.props.examen}/>
+                            </Col>
+                            <Col >
+                                <Container  style={{ width: '1000px', paddingLeft:'0px', marginLeft:'0px', paddingRight: '0px', marginRight: '0px' }}>                                     
+                                    <Row>
+                                        <Alert className="alertmargin" variant='secondary' style={{ width: '100%', paddingLeft:'0px', marginLeft:'0px', paddingRight: '0px', marginRight: '0px' }}>   
+                                        <h4 className='centrado'>ECG examen con ID:{this.props.examen.examen_id} </h4>                                                
+                                        </Alert>
+                                    </Row>
+                                    <Row >
+                                        <div>
+                                            <ChartJs  modificarEstado={this.modificarEstadoGrafica}  estadoGrafica={this.state.estadoGrafica} examen_id={this.props.examen.examen_id} tambloque={this.props.epaciente.Freq_Muestro} />                                    
+                                        </div>
+                                    </Row>
+                                    <Row>
+                                        <Col >
+                                            <button onClick={this.modificarEstadoGrafica} className="btn btn-success btn-block" style={{ width: '50%',float:'right' }}>{this.renderBoton()}</button>
+                                        </Col>
+                                        <Col>
+                                            <button onClick={(e)=>this.props.listaExamenes(this.props.epaciente.usuario_id,2)} className="btn btn-secondary btn-block" style={{ width: '50%',float:'left' }}>Volver</button>
+                                        </Col>                                                                                      
+                                    </Row>
+                                </Container >                                                                 
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>                                                               
             </>
-
         )
     }
 }

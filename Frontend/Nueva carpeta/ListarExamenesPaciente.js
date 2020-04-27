@@ -1,22 +1,7 @@
 import React from 'react';
-import moment from 'moment';
 import '../css/bootstrap/dist/css/bootstrap.min.css';
-
-
 import FilaExamenes from './FilaExamenes';
-import DatosPaciente from './DatosPaciente';
-
-
-// Componentes del ReactBoostrap
-
-import Table from 'react-bootstrap/Table';
-import Alert from 'react-bootstrap/Alert';
-import Jumbotron from 'react-bootstrap/Jumbotron'; 
-import Container from 'react-bootstrap/Container';
-import Card from 'react-bootstrap/Card';
-import ListGroup from 'react-bootstrap/ListGroup';
-import ListGroupItem from 'react-bootstrap/ListGroupItem';
-import CardGroup from 'react-bootstrap/CardGroup'; 
+import moment from 'moment';
 
 
 
@@ -91,7 +76,7 @@ class ListarExamenesPaciente extends React.Component{
          // Esto es para la temporizacion.
         this.timerID = setTimeout(
             () => this.solExamenesBd(),
-            150
+            20
         );
         // Fin de temporizacion
 
@@ -188,58 +173,45 @@ class ListarExamenesPaciente extends React.Component{
         return (
                        
             <>
+                <table>
+                    <tr >
+                        <th>                           
+                            <img onClick={(e)=>this.props.funCancelar()} src={process.env.PUBLIC_URL + '/AtrasIcono.png'} />
+                            <span onClick={(e)=>this.props.funCancelar()} >Volver</span> 
+                        </th>
+                        <th>
+                            <img onClick={this.examenes_submit} src={process.env.PUBLIC_URL + '/ActualizarIcon.png'} />
+                            <span onClick={this.examenes_submit} >Actualizar</span>                             
+                        </th>                        
+                    </tr >
+                </table> 
 
-                <div className="mainDiv" style={{ width: '90%' }}> 
+               
+                <h3> Examenes del Paciente  {this.state.tmpPaciente.Nombre}  {this.state.tmpPaciente.Apellidos} </h3>           
+                <table classname="table ">
 
-                    <Jumbotron  style={{ height: '200px'}}>
-                                                     
-                        <h1 className='centrado'>Exámenes del Paciente  {this.state.tmpPaciente.Nombre}  {this.state.tmpPaciente.Apellidos}</h1>
-                        <p className='centrado'>
-                            En la siguiente Tabla se relacionan todos los exámenes del paciente.                           
-                        </p>
-                                                       
-                    </Jumbotron>
-                    <table >
+                    <thead class="thead-light">
                         <tr >
-                            <td>  
-                                <DatosPaciente paciente={this.state.tmpPaciente}/>                        
-                            </td>
+                            <th scope="col">#</th>                            
+                            <th scope="col">...Id_Examen...</th>                                                       
+                            <th scope="col">...Periodo de Observación (min)...</th>
+                            <th scope="col">...Freq. Muestreo (Hz)...</th>
+                            <th scope="col">...Inicio del Exámen...</th>
+                            <th scope="col">...OPCIONES...</th> 
 
-                            <Alert variant='secondary'>                                                   
-                                <table className="alingTablasCentro2" >
-                                    <tr >
-                                        <th> 
-                                            <img className="alingTablasfilas" onClick={this.examenes_submit} src={process.env.PUBLIC_URL + '/ActualizarIcon.png'} />
-                                            <span className="alingTablasfilas" onClick={this.examenes_submit} >Actualizar</span>                                                     
-                                        </th>
-                                        <th>
-                                            <img className="alingTablasfilas" onClick={(e)=>this.props.funCancelar()} src={process.env.PUBLIC_URL + '/AtrasIcono.png'} />
-                                            <span className="alingTablasfilas"onClick={(e)=>this.props.funCancelar()} >Volver</span> 
-                                        </th>                        
-                                    </tr >
-                                </table> 
-                            </Alert>
-                            <Table striped bordered hover size="sm" >
-                                <thead>
-                                    <tr >
-                                        <th className="centrado">#</th>                            
-                                        <th className="centrado">Id_Examen</th>                                                       
-                                        <th className="centrado"> Período de Observación (min)</th>
-                                        <th className="centrado">Frecuencia de Muestreo (Hz)</th>
-                                        <th className="centrado">Inicio del Exámen</th>
-                                        <th className="centrado">Opciones</th> 
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <>                                                                                     
-                                        {this.state.Examenes.map(this.agregarfila)}                                                                                                                             
-                                    </> 
-                                </tbody>
-                            </Table>                   
-                        </tr >
-                    </table>                    
-                </div>           
-            </>      
+                        </tr>
+                    </thead> 
+
+                    <tbody>  
+                        <>    
+                                                                             
+                            {this.state.Examenes.map(this.agregarfila)}                                               
+                        
+                        </>  
+                    </tbody>                   
+                </table>             
+            </>    
+            
         );
     }
   }  

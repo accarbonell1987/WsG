@@ -24,6 +24,10 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import ListGroupItem from 'react-bootstrap/ListGroupItem';
 import CardGroup from 'react-bootstrap/CardGroup'; 
 
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Button from 'react-bootstrap/Button';
+
 class ListarPacientes extends React.Component{
 
     
@@ -124,7 +128,8 @@ class ListarPacientes extends React.Component{
          
         return (
             
-            <>            
+            <>                 
+
               <tr>
                <th>{i+1}</th>
                 <td align="center" >{paciente.usuario_id}</td>

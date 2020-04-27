@@ -134,15 +134,12 @@ class ChartJs extends React.Component{
         }
             
         if (message.type==='msg_bd'){
-                   
             message.data.forEach(element => {    //para senal
-
                 var tmpx=(element.time*5)/1000;
                 this.x.push(tmpx.toFixed(2)); 
                 //var tmpy= (element.valor*3.3)/1024;                  
                 var tmpy= (element.valor*1);                             
                 this.y.push(tmpy.toFixed(1));
-                     
             }); 
 
             message.data_rr.forEach(elementoRR => {
@@ -152,7 +149,6 @@ class ChartJs extends React.Component{
             });
 
             var ttt=(this.props.tambloque/2);
-            console.log(ttt);
 
             if (this.x.length>(ttt*4)){
 
@@ -161,7 +157,6 @@ class ChartJs extends React.Component{
                 this.x.splice(0,ttt);    
                 this.y.splice(0,ttt);  
                 this.y2.splice(0,ttt);                  
-
             }
 
             this.rr_info= message.rrinfo;

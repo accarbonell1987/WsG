@@ -6,7 +6,43 @@
   }
   .derecha {
     text-align: center;
+  } 
+
+  .formtablaDiv {
+
+    width: 100%;
+    
+ }
+  .mainDiv {
+     margin-top: 1%;
+     margin-left: 5%;
   }
+
+  .botonlogin {    
+    margin-left: 32%;    
+    width: 40%;
+ } 
+ 
+  .cardMargin {
+    margin-top: 0%;    
+ }
+
+  .alertmargin {
+    margin-top: 0%;
+    margin-left: 0%;
+ }
+
+  .alingTablasCentro {
+     margin-left: 20%;      
+ }
+
+ .alingTablasCentro2 {
+  margin-left: 33%;      
+}
+
+ .alingTablasfilas {
+     padding-left: 10px;      
+}
 
   .fin-pagina {
     text-align: center;
@@ -14,12 +50,12 @@
   .contenedor {
     
     margin-top: 3%;
-    margin-left: 30%;
+    margin-left: 30%;    
     width: 40%;
     text-align: left;
       
   }
-
+ 
   .contenedor-e {
     
     margin-top: 10%;

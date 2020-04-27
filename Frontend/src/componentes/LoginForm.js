@@ -6,13 +6,9 @@ import '../css/ecg.css';
 import md5 from 'md5';
 
 
-
+//comentario para subir
 
 class LoginForm extends React.Component{
-
-    //#region Atributos
-    wsAuth = new WebSocket(window.$WebsocketsIp);
-    //#endregion
 
     constructor(props) {
         super(props);
@@ -22,6 +18,8 @@ class LoginForm extends React.Component{
         
         }; 
     }
+       
+    wsAuth = new WebSocket(window.$WebsocketsIp);
                     
     componentDidMount() {
 
@@ -127,19 +125,30 @@ class LoginForm extends React.Component{
     }
 
     vinculoRender = () => {
+
         if (this.state.VistaAdmin) {
+
             return (
+
                 <p className="forgot-password text-right">
                     Ir a  <a href="/"> Login Doctor</a>
                 </p>
+
             )
+
         } else {
+
             return (
+
                 <p className="forgot-password text-right">
                     Ir a  <a href="/Admin"> Login Admin</a>
                 </p>
+
             )
+
         }
+
+
     }
 
     imagenRender = () => {

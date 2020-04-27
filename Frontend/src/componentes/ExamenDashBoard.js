@@ -83,7 +83,7 @@ class ExamenDashBoard extends React.Component{
                                 <DatosExamen examen={this.props.examen}/>
                             </Col>
                             <Col >
-                                <Container  style={{ width: '1000px', paddingLeft:'0px', marginLeft:'0px', paddingRight: '0px', marginRight: '0px' }}>                                     
+                                <Container  style={{ width: '800px', paddingLeft:'0px', marginLeft:'0px', paddingRight: '0px', marginRight: '0px' }}>                                     
                                     <Row>
                                         <Alert className="alertmargin" variant='secondary' style={{ width: '100%', paddingLeft:'0px', marginLeft:'0px', paddingRight: '0px', marginRight: '0px' }}>   
                                         <h4 className='centrado'>ECG examen con ID:{this.props.examen.examen_id} </h4>                                                
@@ -99,7 +99,7 @@ class ExamenDashBoard extends React.Component{
                                             <button onClick={this.modificarEstadoGrafica} className="btn btn-success btn-block" style={{ width: '50%',float:'right' }}>{this.renderBoton()}</button>
                                         </Col>
                                         <Col>
-                                            <button onClick={(e)=>this.props.listaExamenes(this.props.epaciente.usuario_id,2)} className="btn btn-secondary btn-block" style={{ width: '50%',float:'left' }}>Volver</button>
+                                            <button onClick={(e)=>this.props.listaExamenes(this.props.epaciente.usuario_id,2)} className="btn btn-dark btn-block" style={{ width: '50%',float:'left' }}>Volver</button>
                                         </Col>                                                                                      
                                     </Row>
                                 </Container >                                                                 

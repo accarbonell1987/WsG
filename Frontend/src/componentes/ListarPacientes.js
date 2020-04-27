@@ -24,10 +24,6 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import ListGroupItem from 'react-bootstrap/ListGroupItem';
 import CardGroup from 'react-bootstrap/CardGroup'; 
 
-
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Button from 'react-bootstrap/Button';
-
 class ListarPacientes extends React.Component{
 
     
@@ -128,8 +124,7 @@ class ListarPacientes extends React.Component{
          
         return (
             
-            <>                 
-
+            <>            
               <tr>
                <th>{i+1}</th>
                 <td align="center" >{paciente.usuario_id}</td>
@@ -278,19 +273,19 @@ class ListarPacientes extends React.Component{
                                         <table className="alingTablasCentro" >
                                             <tr >
                                                 <th >   
-                                                    <div  style={{ height: '70px'}} className="btn btn-success btn-block">                        
+                                                    <div  style={{ height: '70px'}} className="btn btn-dark btn-block">                        
                                                     <img  onClick={(e)=>this.solPacientesBd()} src={process.env.PUBLIC_URL + '/ActualizarIcon.png'} />
                                                     <span className="alingTablasfilas" onClick={(e)=>this.solPacientesBd()}>Actualizar Pacientes</span>  
                                                     </div> 
                                                 </th>
                                                 <th >
-                                                    <div style={{ height: '70px'}} className="btn btn-success btn-block"> 
+                                                    <div style={{ height: '70px'}} className="btn btn-dark btn-block"> 
                                                     <img  className="alingTablasfilas" onClick={(e)=>this.cambiarRender(1)} src={process.env.PUBLIC_URL + '/InsertarPacienteIcono.png'} />
                                                     <span className="alingTablasfilas" onClick={(e)=>this.cambiarRender(1)}>Insertar Paciente</span>                             
                                                     </div>
                                                 </th>
                                                 <th>  
-                                                    <div style={{ height: '70px'}} className="btn btn-success btn-block">                         
+                                                    <div style={{ height: '70px'}} className="btn btn-dark btn-block">                         
                                                     <img className="alingTablasfilas" onClick={(e)=>this.props.salir()} src={process.env.PUBLIC_URL + '/logout2.png'} />
                                                     <span className="alingTablasfilas" onClick={(e)=>this.props.salir()}>Salir Sesión</span>  
                                                     </div>

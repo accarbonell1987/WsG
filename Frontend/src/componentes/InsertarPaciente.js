@@ -233,7 +233,7 @@ class InsertarPaciente extends React.Component{
                                                     <button type="submit" className="btn btn-success btn-block">Insertar Paciente</button>
                                                 </Col>
                                                 <Col>
-                                                    <button onClick={(e)=>this.props.fun(0)} className="btn btn-secondary btn-block">Cancelar</button>
+                                                    <button onClick={(e)=>this.props.fun(0)} className="btn btn-dark btn-block">Cancelar</button>
                                                 </Col>
                                             </Row>
                                         </Container>                                                                                              

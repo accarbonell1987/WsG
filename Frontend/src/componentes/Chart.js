@@ -48,7 +48,7 @@ class ChartJs extends React.Component{
                     animationDuration: 0 // duration of animations when hovering an item
                 },*/
                 //responsiveAnimationDuration: 0, // animation duration after a resize                             
-                responsive: true,
+                responsive: true,                
                 legend: { display: true },
                 maintainAspectRatio: true,                 
                 scales: {
@@ -134,12 +134,15 @@ class ChartJs extends React.Component{
         }
             
         if (message.type==='msg_bd'){
+                   
             message.data.forEach(element => {    //para senal
+
                 var tmpx=(element.time*5)/1000;
                 this.x.push(tmpx.toFixed(2)); 
                 //var tmpy= (element.valor*3.3)/1024;                  
                 var tmpy= (element.valor*1);                             
                 this.y.push(tmpy.toFixed(1));
+                     
             }); 
 
             message.data_rr.forEach(elementoRR => {
@@ -149,6 +152,7 @@ class ChartJs extends React.Component{
             });
 
             var ttt=(this.props.tambloque/2);
+            console.log(ttt);
 
             if (this.x.length>(ttt*4)){
 
@@ -157,6 +161,7 @@ class ChartJs extends React.Component{
                 this.x.splice(0,ttt);    
                 this.y.splice(0,ttt);  
                 this.y2.splice(0,ttt);                  
+
             }
 
             this.rr_info= message.rrinfo;
@@ -255,7 +260,7 @@ class ChartJs extends React.Component{
             <>                    
                 <Container >
                     <Row>                                                                                                                            
-                        <Line data={this.state.datos} options={this.state.opciones}  width="1200px" height="300px" redraw/>                                                                                     
+                        <Line data={this.state.datos} options={this.state.opciones}  width="970px" height="300px" redraw/>                                                                                     
                     </Row >
                     <Row>
                         <RRInfo rrinfo={this.state.rr_info_state} FM={this.props.tambloque}/>

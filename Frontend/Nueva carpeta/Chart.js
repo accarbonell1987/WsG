@@ -3,19 +3,7 @@ import React from 'react';
 import {Line} from 'react-chartjs-2';
 import RRInfo from './RRInfo';
 
-
-// Componentes del ReactBoostrap
-
-import Card from 'react-bootstrap/Card';
-import ListGroup from 'react-bootstrap/ListGroup';
-import ListGroupItem from 'react-bootstrap/ListGroupItem';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
-import Container from 'react-bootstrap/Container';
-
 //const wsChart = new WebSocket('ws://localhost:2000');
-
-//<div style={{ padding:"20px", width: "100%" }} ><RRInfo rrinfo={this.state.rr_info_state} FM={this.props.tambloque}/> </div>
 
 class ChartJs extends React.Component{
       
@@ -56,7 +44,7 @@ class ChartJs extends React.Component{
 
                         scaleLabel: {
                             display: true,
-                            labelString: 'Tiempo (s)',
+                            labelString: 'Tiempo (S)',
                             fontSize: 15,
                             fontColor: '#ff0000',
                         },
@@ -75,7 +63,7 @@ class ChartJs extends React.Component{
 
                         scaleLabel: {                            
                             display: true,
-                            labelString: 'Tensión (v)',
+                            labelString: 'Tensión (V)',
                             fontSize: 15,
                             fontColor: '#ff0000',
                         },
@@ -134,12 +122,15 @@ class ChartJs extends React.Component{
         }
             
         if (message.type==='msg_bd'){
+                   
             message.data.forEach(element => {    //para senal
+
                 var tmpx=(element.time*5)/1000;
                 this.x.push(tmpx.toFixed(2)); 
                 //var tmpy= (element.valor*3.3)/1024;                  
                 var tmpy= (element.valor*1);                             
                 this.y.push(tmpy.toFixed(1));
+                     
             }); 
 
             message.data_rr.forEach(elementoRR => {
@@ -149,14 +140,16 @@ class ChartJs extends React.Component{
             });
 
             var ttt=(this.props.tambloque/2);
+            console.log(ttt);
 
-            if (this.x.length>(ttt*4)){
+            if (this.x.length>(ttt*8)){
 
                 console.log('entro');
 
                 this.x.splice(0,ttt);    
                 this.y.splice(0,ttt);  
                 this.y2.splice(0,ttt);                  
+
             }
 
             this.rr_info= message.rrinfo;
@@ -205,6 +198,8 @@ class ChartJs extends React.Component{
     
          } 
 
+        
+
      // Esto es para la temporizacion.
     this.timerID = setInterval(
         () => this.tick(),
@@ -251,19 +246,26 @@ class ChartJs extends React.Component{
             
     render() {
       
-        return (             
-            <>                    
-                <Container >
-                    <Row>                                                                                                                            
-                        <Line data={this.state.datos} options={this.state.opciones}  width="1200px" height="300px" redraw/>                                                                                     
-                    </Row >
-                    <Row>
-                        <RRInfo rrinfo={this.state.rr_info_state} FM={this.props.tambloque}/>
-                    </Row>
-                </Container>
+        return (   
+          
+            <>    
+                <h3 position="center"> Grafica ECG Paciente</h3> 
+                <table >
+                    <tr >
+                        <th>                                
+                            <div  style={{ position: "relative", width: "100%", height: "320px" }}>                                               
+                                <Line data={this.state.datos} options={this.state.opciones}  width="1200px" height="300px" redraw/>                   
+                            </div> 
+                        </th>
+                        <th>                                
+                            <div style={{ padding:"20px", width: "100%", height: "320px" }} ><RRInfo rrinfo={this.state.rr_info_state} FM={this.props.tambloque}/> </div>    
+                        </th>                        
+                    </tr >
+                </table>
                                        
             </>             
         );
     }
   }  
+
 export default ChartJs;

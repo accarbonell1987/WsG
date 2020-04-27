@@ -3,27 +3,19 @@ import React from 'react';
 //import img_user from '../imagenes/user.png';
 //import '../css/App.css';
 import '../css/ecg.css';
-import md5 from 'md5';
-
-
-
 
 class LoginForm extends React.Component{
 
     constructor(props) {
         super(props);
         this.state = {  
-            
             VistaAdmin: this.props.VistaAdmin         
-        
         }; 
     }
        
     wsAuth = new WebSocket(window.$WebsocketsIp);
                     
     componentDidMount() {
-
-        console.log('md5:    '+md5('rubencito'));
 
         this.wsAuth.onopen = () => {     
 
@@ -177,7 +169,7 @@ class LoginForm extends React.Component{
     render() {
         return (
             
-            <div style={{ width: '25%', marginLeft:'37%', marginTop:'5%'}} className=" contenedor">
+            <div className=" contenedor">
                                                 
                 <form className="form-group" onSubmit={this.auth_submit}>
                                         
@@ -206,7 +198,7 @@ class LoginForm extends React.Component{
                         </div>
                     </div>
 
-                    <button   type="submit" className="btn btn-primary btn-block botonlogin">Autenticar</button>
+                    <button  type="submit" className="btn btn-primary btn-block">Autenticar</button>
                     {this.vinculoRender()}
 
                 </form>

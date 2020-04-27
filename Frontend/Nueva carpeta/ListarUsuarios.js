@@ -82,7 +82,7 @@ class ListarUsuarios extends React.Component{
          // Esto es para la temporizacion.
         this.timerID = setTimeout(
             () => this.solUsuariosBd(),
-            150
+            20
         );
         // Fin de temporizacion
 

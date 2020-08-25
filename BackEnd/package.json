@@ -1,0 +1,17 @@
+{
+  "name": "wsg_backend",
+  "version": "1.0.0",
+  "description": "Back_End del WsG",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ing. Ruben Cobo Alea",
+  "license": "ISC",
+  "dependencies": {
+    "moment": "^2.24.0",
+    "mongodb": "^3.5.3",
+    "mongoose": "^5.9.2",
+    "websocket": "^1.0.31"
+  }
+}

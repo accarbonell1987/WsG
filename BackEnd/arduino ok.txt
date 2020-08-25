@@ -1,0 +1,433 @@
+
+/*.....................................DECLARACION DE BIBLIOTECAS..............................*/
+
+#include <Arduino.h>
+#include <ESP8266WiFi.h>
+#include <ESP8266WiFiMulti.h>
+#include <WebSocketsClient.h>
+#include <Hash.h>
+
+/*...................................FIN DECLARACION DE BIBLIOTECAS............................*/
+
+/*.................................DECLARACION DE VARIABLES GLOBALES..........................*/
+
+#define USE_SERIAL Serial              // Definir el puerto serie 0 a utilizar.
+ESP8266WiFiMulti WiFiMulti;            // Definir instancia de la clase wifi.
+WebSocketsClient webSocket;            // Definir instancia de la clase websocket.
+
+String data;                           // Almacena el Dato a enviar por websocket
+String ws_id="123";                    // ID del dispositivo en el sistema.
+short Freq_Muestreo=0;                 // Frecuencia de muestreo de trabajo. 
+int Periodo_Obs=0;                     // Periodo de observacion de la señal enviado desde el servidor en minutos.
+long periodo_obs_tick=0;               // indica la cantidad de desbordes maxima que debe hacer el timer la lograr el periodo de obs que se quiere.
+long cont_periodo_tick=0;              // contador de los tick del timer transcurrido.
+int timer_desb=5;                      // cantidad de milisegundos para que desborde el timer.
+long cout_muestras_tx=0;               // cantidad d emuestras tx ya al servidor.
+int contador_led=0;                    // contador de tick para encender el led.
+
+
+// Declaraciones de variables de estado de ejecucion del programa
+
+bool fm_ok=false;                      // Indica ya servidor envio la fm
+bool periodo_obs_ok=false;             // Indica ya servidor envio el periodo de observacion.
+bool tx_estado_ok=false;               // Indica ya servidor envio el tx estado.
+bool nuevo_examen_ok=false;            // Indica ya servidor creo el nuevo registro de examen.
+bool sol_conf=false;                   // Indica si ya fueron solicitadas las configuraciones iniciales.
+bool ws_estado=false;                  // Define el estado de la cnx del WS   true:WS CNX... false:WS NoCNX
+bool sreg_estado=false;                // Define el estado del usuario en el servidor  True:Usuario registrado en servidor con el id propio 
+bool tx_estado=false;                  // Define el estado de la tx de las muestras: true->empezar a eviar muestas al servidor....false-> no envio esperar que server autorice.
+bool muestra_tx_estado=false;          // Define si el server recibio correctamente la muestra enviada. true:recibio ok... false:error en tx.
+bool w_estado=false;                   // Define si la cnx al Ap wifi esta ok.. true:cnx.... false: no cnx.
+bool ini_conf=false;                   // Define si ya se obtivuieron los datos de conf iniciles en servidor.
+bool estado_led=false;                  // Define el estado del led limpiador.
+
+
+// Variables para el manejor de cadenas String
+  
+String jsonString = "";                // cadena para crear el json  
+
+
+// Declaraciones para el buffer de tx
+int buffer_rt[5000];                    // buffer de datos para tx en rt.
+long buffer_prox_pos=0;                   // ultima posicion con datos del arreglo.
+long buffer_tmp=0;                       // posisicon actual para tx en rt.
+bool primera_captura=false;              // indica que ya el timer hizo la primera captura.
+
+
+/*.................................FIN DECLARACION DE VARIABLES GLOBALES..........................*/
+
+/*................................Interrupcion del time del ESP8266...............................*/
+
+extern "C" {
+#include "user_interface.h"
+}
+
+os_timer_t myTimer;
+
+//bool tickOccured;
+
+// Cominezo de la callback del timer
+void timerCallback(void *pArg) {
+
+      if ((tx_estado)&&(cont_periodo_tick<periodo_obs_tick)){ // si ya puedo capturar entonces comienzo el registro.
+        
+         //tickOccured = true;         
+         buffer_rt[buffer_prox_pos]= analogRead(A0);                                                         
+         buffer_prox_pos++;
+         primera_captura=true;
+         if (buffer_prox_pos>4998){buffer_prox_pos=0;}  //reinicio del buffer circular
+         cont_periodo_tick++;
+         if (contador_led>50){
+            contador_led=0;
+            digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+          }
+         contador_led++;                        
+        }
+      if (cont_periodo_tick>periodo_obs_tick){digitalWrite(LED_BUILTIN, LOW);}  
+           
+} // Fin de la callback del timer
+
+void user_init(void) {
+ /*
+  os_timer_setfn - Define a function to be called when the timer fires
+
+void os_timer_setfn(
+      os_timer_t *pTimer,
+      os_timer_func_t *pFunction,
+      void *pArg)
+
+Define the callback function that will be called when the timer reaches zero. The pTimer parameters is a pointer to the timer control structure.
+
+The pFunction parameters is a pointer to the callback function.
+
+The pArg parameter is a value that will be passed into the called back function. The callback function should have the signature:
+void (*functionName)(void *pArg)
+
+The pArg parameter is the value registered with the callback function.
+*/
+
+      os_timer_setfn(&myTimer, timerCallback, NULL);
+
+/*
+      os_timer_arm -  Enable a millisecond granularity timer.
+
+void os_timer_arm(
+      os_timer_t *pTimer,
+      uint32_t milliseconds,
+      bool repeat)
+
+Arm a timer such that is starts ticking and fires when the clock reaches zero.
+
+The pTimer parameter is a pointed to a timer control structure.
+The milliseconds parameter is the duration of the timer measured in milliseconds. The repeat parameter is whether or not the timer will restart once it has reached zero.
+
+*/
+
+      os_timer_arm(&myTimer, timer_desb, true);   // el timer se dispara cada 5 ms (timer desb es mi variable para que le timer dispare aqui va la cantidad de milisegundos en entero)
+      
+} // End of user_init
+
+/*................................Interrupcion del time del ESP8266...............................*/
+
+/*.................................FUNCION MANEJADORA DE EVENTOS WEBSOCKET..........................*/
+
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+
+  switch(type) {
+    
+    case WStype_DISCONNECTED:
+    
+      USE_SERIAL.printf("[WSc]: desconectado !!!!!\n");
+      ws_estado=false;
+      
+      break;
+    case WStype_CONNECTED: {
+      
+      USE_SERIAL.printf("[WSc]: conectado !!!!!\n");
+      ws_estado=true;   
+           
+    }
+      break;
+      
+    case WStype_TEXT: {
+    
+      USE_SERIAL.printf("[WSc]: %s\n", payload);
+      String texto_rx = String((char *) &payload[0]);    // llevar a texto     
+      chequeo_rx_ws(texto_rx);                           // llamar a funcion que deternine q se hace con el datos rx 
+
+    }
+      break;
+      
+    case WStype_BIN:
+    
+      USE_SERIAL.printf("[WSc] get binary length: %u\n", length);
+      hexdump(payload, length);
+
+      // send data to server
+      // webSocket.sendBIN(payload, length);
+      
+      break;
+  }
+
+}
+
+/*................................. FIN FUNCION MANEJADORA DE EVENTOS WEBSOCKET..........................*/
+
+
+/*....................................... DEFINICIONES E INICIALIZACIONES...............................*/
+
+void setup() {
+
+ /*................ PUERTOS...........*/
+ 
+  pinMode(4, INPUT); // Setup for leads off detection LO +
+  pinMode(5, INPUT); // Setup for leads off detection LO -
+
+  pinMode(LED_BUILTIN, OUTPUT);  // Inicializando el lED
+
+
+/*................ PUERTO SERIE...........*/
+  USE_SERIAL.begin(9600);  
+  USE_SERIAL.setDebugOutput(true);
+  
+/*..................... WIFI.............*/
+
+  //WiFiMulti.addAP("WIFI_KRATOS", "Accp2017/*");
+  WiFiMulti.addAP("Legolas", "legolas*12345");
+  //WiFiMulti.addAP("Extender", "taller108");
+
+  //WiFi.disconnect();
+  while(WiFiMulti.run() != WL_CONNECTED) {         // comprueba cnx con AP Wifi mientras no este cnx trata de reconectar
+    w_estado=false;
+    delay(100);
+  }
+
+  w_estado=true;
+  
+/*................. WEBSOCKET...............*/
+  
+ // webSocket.begin("192.168.99.121", 2000, "/");            // taller
+  webSocket.begin("192.168.43.121", 2000, "/");          // movil
+ // webSocket.begin("192.168.0.121", 2000, "/");           // albertico
+  
+  // Manejador de eventos
+  webSocket.onEvent(webSocketEvent);
+  
+  // tiempo de reconexion con el servidor websoket
+  webSocket.setReconnectInterval(5000);
+
+
+  /*................. INTERRUPCION DEL TIMER...............*/
+
+  user_init();       // Habilita interrupcion del timer 
+
+}
+/*..................................... FIN DEFINICIONES E INICIALIZACIONES...............................*/
+
+
+
+/*................................... FUNCIONES AUXILIARES..............................................*/
+
+void chequeo_rx_ws(String t_rx_ws){       // Comprueba lo que llega del WS
+  
+
+      if (t_rx_ws=="OKR"){   // Servidor responde que el usuario esta registrado en el sistema.
+        
+         sreg_estado=true;
+         USE_SERIAL.println("Registrado en Servidor Node JS .. WsG\n");
+            
+      }
+
+      if (t_rx_ws=="OKE"){   // Servidor responde que el usuario ya tiene un nuevo registro de examen.
+        
+         nuevo_examen_ok=true;
+         USE_SERIAL.println("Server informa que ya se creo un nuevo examen\n");
+            
+      }
+
+      if (t_rx_ws=="OKC"){   // Servidor responde que el usuario esta libre para Comenzar a trasnmitir datos.
+        
+         tx_estado=true;
+         tx_estado_ok=true;
+         USE_SERIAL.println("Server Autoriza envio de muestras.. Comenzando \n");
+            
+      }
+
+      if (t_rx_ws=="DET"){   // Servidor responde que el usuario debe detener la  trasnmicion datos.
+        
+         tx_estado=false;
+         tx_estado_ok=true;
+         USE_SERIAL.println(" Server Detiene envio de muestras.. Comenzando \n");
+            
+      }
+
+      if (t_rx_ws=="FM:100"){   // Servidor responde que la frecuencia de muestreo a utilizar es 100Hz.
+        
+         Freq_Muestreo=100; 
+         timer_desb=10;
+         fm_ok=true;
+         USE_SERIAL.println(" Frecuencia de muestro definida por server: 100Hz \n");
+            
+      }
+
+      if (t_rx_ws=="FM:200"){   // Servidor responde que la frecuencia de muestreo a utilizar es 200Hz.
+        
+         Freq_Muestreo=200; 
+         timer_desb=5;
+         fm_ok=true;
+         USE_SERIAL.println(" Frecuencia de muestro definida por server: 200Hz \n");
+            
+      }
+
+      if (t_rx_ws=="FM:250"){   // Servidor responde que la frecuencia de muestreo a utilizar es 250Hz.
+        
+         Freq_Muestreo=250;
+         timer_desb=4;
+         fm_ok=true; 
+         USE_SERIAL.println(" Frecuencia de muestro definida por server: 250Hz \n");
+            
+      }
+
+      if (t_rx_ws=="FM:500"){   // Servidor responde que la frecuencia de muestreo a utilizar es 500Hz.
+        
+         Freq_Muestreo=500; 
+         timer_desb=2;
+         fm_ok=true;
+         USE_SERIAL.println(" Frecuencia de muestro definida por server: 500Hz \n");
+            
+      }
+
+      
+      if (t_rx_ws=="T:1"){   // Servidor responde que el periodo de observacion es de 1 min.
+        
+         Periodo_Obs=1; 
+         periodo_obs_ok=true;
+         USE_SERIAL.println(" Periodo de Observacion definido por server: 1 min \n");
+            
+      }
+
+      if (t_rx_ws=="T:3"){   // Servidor responde que el periodo de observacion es de 3 min.
+        
+         Periodo_Obs=3; 
+         periodo_obs_ok=true;
+         USE_SERIAL.println(" Periodo de Observacion definido por server: 3 min \n");
+            
+      }
+
+      if (t_rx_ws=="T:15"){   // Servidor responde que el periodo de observacion es de 15 min.
+        
+         Periodo_Obs=15;
+         periodo_obs_ok=true; 
+         USE_SERIAL.println(" Periodo de Observacion definido por server: 15 min \n");
+            
+      }
+
+      if (t_rx_ws=="T:30"){   // Servidor responde que el periodo de observacion es de 30 min.
+        
+         Periodo_Obs=30; 
+         periodo_obs_ok=true;
+         USE_SERIAL.println(" Periodo de Observacion definido por server: 30 min \n");
+            
+      }
+
+      if (t_rx_ws=="T:CONT"){   // Servidor responde que el periodo de observacion es CONTINUO SIN PARADAS HASTA NUEVO AVISO.
+        
+         Periodo_Obs=1000;   // le asignamos en este caso el valor 1000 para saber que la tx de muestra es continua en el tiempo.
+         periodo_obs_ok=true;
+         USE_SERIAL.println(" Periodo de Observacion definido por server: CONTINUO \n");
+            
+      }
+
+
+      if ((periodo_obs_ok)&&(fm_ok)&&(tx_estado_ok)&&(sreg_estado)&&(nuevo_examen_ok)){
+          
+           periodo_obs_tick=Periodo_Obs*60*Freq_Muestreo;
+           ini_conf=true;   //indica que el sistema ya tiene las configuraciones inciales.
+        
+        }
+                  
+  } 
+
+void conf_servidor(void){       // Busca Datos de Inicializacion en Servidor. 
+
+
+    if ((ws_estado)&&(w_estado)){   // si la wifi esta conectada ok y el websockets esta conectado ok 
+
+
+          // Enviar el id al servidor para registro
+          USE_SERIAL.println("Iniciando Registro en Node JS..WsG....\n");
+          jsonString=String("{\"type\":\"paciente_id\",\"data\":"+ws_id+"}");   
+         //webSocket.sendTXT("{\"type\":\"id\",\"data\":123}");  
+          webSocket.sendTXT(jsonString); 
+          delay(100);
+
+          // Solicitar creacion de un nuevo examen.
+          USE_SERIAL.println("Solicitando creancion de un nuevo examen en Node JS..WsG....\n");
+          webSocket.sendTXT("{\"type\":\"examen_id\",\"data\":0}");            
+          webSocket.sendTXT(jsonString); 
+          delay(100);
+      
+          // Obtener del servidor la Frecuencia de muestreo a Utilizar.
+          USE_SERIAL.println("Buscando FM....\n");
+          webSocket.sendTXT("{\"type\":\"FM_ESTADO\",\"data\":0}");
+          //webSocket.sendTXT("FM_ESTADO");
+          delay(100);
+          
+          // Obtener del servidor el Periodo de Observacion a Utilizar.
+          USE_SERIAL.println("Buscando PERIODO_ESTADO....\n");
+          webSocket.sendTXT("{\"type\":\"PERIODO_ESTADO\",\"data\":0}");
+          //webSocket.sendTXT("PERIODO_ESTADO");
+          delay(100);
+          
+          // Obtener del servidor la el Estado de Transmision de muestras.
+          USE_SERIAL.println("Buscando TX_ESTADO....\n");
+          webSocket.sendTXT("{\"type\":\"TX_ESTADO\",\"data\":0}");
+          //webSocket.sendTXT("TX_ESTADO");
+          delay(100); 
+
+          delay (200); // esperar que el server responda
+          sol_conf=true;
+      
+      }    
+      
+}
+/*..................................... FIN FUNCIONES AUXILIARES...............................*/
+
+
+
+/*.......................................... FUNCION BUCLE ..................................*/
+
+void loop() {
+ 
+  webSocket.loop();
+
+  if (!sol_conf){       // Solicitar las configuraciones iniciales.
+
+       conf_servidor();   // Buscar Datos de Inicializacion en Servidor. 
+    
+    }
+
+      
+  if ((tx_estado)&&(ws_estado)&&(ini_conf)&&(primera_captura)&&(cout_muestras_tx<periodo_obs_tick)){        // Si ya estoy configurado,registrado con ws activo, con autorizo para tx y hay disponibilidad de datos y no se ha alcanzado el maximo de muestras segun periodo de obs a tx entonces enviar
+
+      
+      if (cout_muestras_tx<cont_periodo_tick){
+        
+            data = String(buffer_rt[buffer_tmp]);
+            jsonString=String("{\"type\":\"muestra\",\"data\":"+data+"}");                   
+            webSocket.sendTXT(jsonString);                 
+            Serial.println(buffer_rt[buffer_tmp]);
+            buffer_rt[buffer_tmp]=3000;     // valor para que sepa que ya esta pos se tx.
+            buffer_tmp++;
+            if (buffer_tmp>4998){buffer_tmp=0;}
+            cout_muestras_tx++;
+        
+        
+        }
+
+                                                                                    
+  } 
+             
+}
+
+/*..................................... FIN FUNCION BUCLE...............................*/

@@ -72,7 +72,41 @@ function filt_PA_1(PA_muestra){
 
 }
 
+function filt_PB_40(PA_muestra){
+
+    // Coeficientes del Filtro pasa Bajos Fc=40Hz.
+
+var Yn_1=0;
+var Yn_2=0;
+var Xn=0;
+var Xn_1=0;
+var Xn_2=0;
+var B1=0.2066;
+var B2=0.4131;
+var B3=0.2066;
+var A1=1;
+var A2=-0.3695;
+var A3=0.1958;
+var Yn=0;
+
+// Filtrado pas alto
+Xn=PA_muestra;
+Yn= B1*Xn + B2*Xn_1 + B3*Xn_2 - A2*Yn_1 - A3*Yn_2;
+                        
+Xn_2=Xn_1;
+Xn_1=Xn;
+Yn_2=Yn_1;
+Yn_1=Yn;
+
+// Fin Filtrado Pasa alto
+
+return Yn;
+
+
+}
+
 module.exports = {
     "filt_PB_5_15": filt_PB_5_15,
-    "filt_PA_1": filt_PA_1
+    "filt_PA_1": filt_PA_1,
+    "filt_PB_40":filt_PB_40
 }

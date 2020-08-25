@@ -4,6 +4,8 @@
   "description": "Back_End del WsG",
   "main": "server.js",
   "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ing. Ruben Cobo Alea",
@@ -12,6 +14,7 @@
     "moment": "^2.24.0",
     "mongodb": "^3.5.3",
     "mongoose": "^5.9.2",
+    "nodemon": "^2.0.4",
     "websocket": "^1.0.31"
   }
 }
